@@ -143,5 +143,102 @@ describe('Password manager', async function () {
             expect(Object.getOwnPropertyNames(contentsObj.kvs)).to.have.length(10);
         });
 
+        it('should update an entry and not create a new one', async function() {
+            let keychain = await Keychain.init(password);
+            let url = 'www.example.com';
+            let pw1 = 'password1';
+            let pw2 = 'password2';
+            await keychain.set(url, pw1);
+            await keychain.set(url, pw2);
+            expect(await keychain.get(url)).to.equal(pw2);
+        });
+
+        it('should update an entry and not create a new one', async function() {
+            let keychain = await Keychain.init(password);
+            let url = 'www.example.com';
+            let pw1 = 'password1';
+            let pw2 = 'password2';
+            await keychain.set(url, pw1);
+            await keychain.set(url, pw2);
+            expect(await keychain.get(url)).to.equal(pw2);
+        });
+
+        it('should not contain password in the dump', async function() {
+            let keychain = await Keychain.init(password);
+            let url = 'www.example.com';
+            let pw = 'password';
+            await keychain.set(url, pw);
+            let data = await keychain.dump();
+            let contents = data[0];
+            expect(contents).not.to.contain(password);
+        });
+
+        it('should not contain password in the dump', async function() {
+            let keychain = await Keychain.init(password);
+            let url = 'www.example.com';
+            let pw = 'password';
+            await keychain.set(url, pw);
+            let data = await keychain.dump();
+            let contents = data[0];
+            expect(contents).not.to.contain(password);
+        });
+
+        it('should prevent rollback attacks', async function() {
+            let keychain = await Keychain.init(password);
+            let url = 'www.google.com';
+            let pw1 = 'oldGooglePassword';
+            let pw2 = 'newGooglePassword';
+            await keychain.set(url, pw1);
+            let data1 = await keychain.dump();
+            await keychain.set(url, pw2);
+            let data2 = await keychain.dump();
+            await expectReject(Keychain.load(password, data1[0], data2[1]));
+        });
+
+
+        it('should not allow setting an empty password', async function() {
+            let keychain = await Keychain.init(password);
+            let url = 'www.example.com';
+            let pw = '';
+            await expectReject(keychain.set(url, pw));
+        });
+
+        it('should not allow setting a password for an empty domain', async function() {
+            let keychain = await Keychain.init(password);
+            let url = '';
+            let pw = 'password';
+            await expectReject(keychain.set(url, pw));
+        });
+
+        it('should not allow setting a null password', async function() {
+            let keychain = await Keychain.init(password);
+            let url = 'www.example.com';
+            let pw = null;
+            await expectReject(keychain.set(url, pw));
+        });
+
+        it('should not allow setting a password for a null domain', async function() {
+            let keychain = await Keychain.init(password);
+            let url = null;
+            let pw = 'password';
+            await expectReject(keychain.set(url, pw));
+        });
+
+        it('should not allow setting a password with whitespace only', async function() {
+            let keychain = await Keychain.init(password);
+            let url = 'www.example.com';
+            let pw = '     ';
+            await expectReject(keychain.set(url, pw));
+        });
+
+        it('should not allow setting a password for a domain with whitespace only', async function() {
+            let keychain = await Keychain.init(password);
+            let url = '     ';
+            let pw = 'password';
+            await expectReject(keychain.set(url, pw));
+        });
+
+
+
     });
 });

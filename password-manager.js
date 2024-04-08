@@ -212,6 +212,10 @@ class Keychain {
      * Return Type: void
      */
     async set(name, value) {
+        // name and value should not whitespace only
+        if (!name.trim() || !value.trim()) {
+            throw "Invalid input!";
+        }
         if (value.length > MAX_PASSWORD_LENGTH) {
             throw "Password is too long!";
         }
