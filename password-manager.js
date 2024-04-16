@@ -237,7 +237,9 @@ class Keychain {
             delete this.kvs[key];
             return true;
         }
-        return false;
+        else {
+            return false;
+        }
     };
 }
 
