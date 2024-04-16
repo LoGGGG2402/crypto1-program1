@@ -238,6 +238,13 @@ describe('Password manager', async function () {
             await expectReject(keychain.set(url, pw));
         });
 
+        it('should not allow setting a password with whitespace only', async function() {
+            let keychain = await Keychain.init(password);
+            let url = 'www.example.com';
+            let pw = '     ';
+            await expectReject(keychain.set(url, pw));
+        });
+
 
 
     });
